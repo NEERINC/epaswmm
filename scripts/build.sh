@@ -17,6 +17,7 @@ gcc -Wall \
 	dwflow.c \
 	dynwave.c \
 	error.c \
+	exfil.c \
 	findroot.c \
 	flowrout.c \
 	forcmain.c \
@@ -58,7 +59,7 @@ gcc -Wall \
     transect.c \
     treatmnt.c \
     xsect.c \
-    -o epaswmm5.1.6 -lm
+    -o epaswmm5.1.7 -lm
 cd ..
-mv ./src/epaswmm5.1.6 .
+mv ./src/epaswmm5.1.7 .
 rm -rf ./src
