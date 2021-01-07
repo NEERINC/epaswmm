@@ -4,6 +4,7 @@
 //   Project:  EPA SWMM5
 //   Version:  5.1
 //   Date:     03/21/2014  (Build 5.1.001)
+//             04/14/14    (Build 5.1.004)
 //   Author:   L. Rossman (EPA)
 //
 //   Report writing functions.
@@ -243,6 +244,12 @@ void report_writeOptions()
     if ( IgnoreRainfall || Nobjects[GAGE] == 0 )
         fprintf(Frpt.file, "NO");
     else fprintf(Frpt.file, "YES");
+
+    fprintf(Frpt.file, "\n    RDII ................... ");                     //(5.1.004)
+    if ( IgnoreRDII || Nobjects[UNITHYD] == 0 )
+        fprintf(Frpt.file, "NO");
+    else fprintf(Frpt.file, "YES");
+
     fprintf(Frpt.file, "\n    Snowmelt ............... ");
     if ( IgnoreSnowmelt || Nobjects[SNOWMELT] == 0 )
         fprintf(Frpt.file, "NO");

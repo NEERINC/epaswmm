@@ -4,6 +4,7 @@
 //   Project: EPA SWMM5
 //   Version: 5.1
 //   Date:    03/20/14  (Build 5.1.000)
+//            04/14/14  (Build 5.1.004)
 //   Author:  L. Rossman
 //
 //   Exportable keyword dictionary
@@ -75,7 +76,7 @@ char* OptionWords[]        = { w_FLOW_UNITS,        w_INFIL_MODEL,
                                w_IGNORE_ROUTING,    w_IGNORE_QUALITY,
                                w_MAX_TRIALS,        w_HEAD_TOL,
                                w_SYS_FLOW_TOL,      w_LAT_FLOW_TOL,
-                               NULL};
+                               w_IGNORE_RDII,       NULL};                     //(5.1.004)
 char* FlowUnitWords[]      = { w_CFS, w_GPM, w_MGD, w_CMS, w_LPS, w_MLD, NULL};
 char* ForceMainEqnWords[]  = { w_H_W, w_D_W, NULL};
 char* LinkOffsetWords[]    = { w_DEPTH, w_ELEVATION, NULL};
