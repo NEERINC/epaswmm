@@ -15,8 +15,8 @@
 //      HTfree()   - frees a hash table
 //-----------------------------------------------------------------------------
 
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 #include "hash.h"
 #define UCHAR(x) (((x) >= 'a' && (x) <= 'z') ? ((x)&~32) : (x))
 

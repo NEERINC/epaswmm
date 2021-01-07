@@ -14,6 +14,7 @@ gcc -Wall \
 	controls.c \
 	culvert.c \
 	datetime.c \
+	dwflow.c \
 	dynwave.c \
 	error.c \
 	findroot.c \
@@ -22,6 +23,7 @@ gcc -Wall \
 	gage.c \
 	gwater.c \
 	hash.c \
+	hotstart.c \
 	iface.c \
 	infil.c \
 	inflow.c \
@@ -31,6 +33,7 @@ gcc -Wall \
 	kinwave.c \
 	landuse.c \
 	lid.c \
+	lidproc.c \
 	link.c \
 	massbal.c \
 	mathexpr.c \
@@ -55,7 +58,7 @@ gcc -Wall \
     transect.c \
     treatmnt.c \
     xsect.c \
-    -o epaswmm5.0.22 -lm
+    -o epaswmm5.1.1 -lm
 cd ..
-mv ./src/epaswmm5.0.22 .
+mv ./src/epaswmm5.1.1 .
 rm -rf ./src
