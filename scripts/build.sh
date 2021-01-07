@@ -58,7 +58,7 @@ gcc -Wall \
     transect.c \
     treatmnt.c \
     xsect.c \
-    -o epaswmm5.1.5 -lm
+    -o epaswmm5.1.6 -lm
 cd ..
-mv ./src/epaswmm5.1.5 .
+mv ./src/epaswmm5.1.6 .
 rm -rf ./src
