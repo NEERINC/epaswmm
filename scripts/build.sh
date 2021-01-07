@@ -9,8 +9,6 @@ cd ./src
 sed -i "" 's/#define DLL/\/\/#define DLL/' ./swmm5.c
 sed -i "" 's/\/\/#define CLE/#define CLE/' ./swmm5.c
 gcc -Wall \
-	main.c \
-	swmm5.c \
 	climate.c \
 	controls.c \
 	culvert.c \
@@ -37,6 +35,7 @@ gcc -Wall \
 	lid.c \
 	lidproc.c \
 	link.c \
+	main.c \
 	massbal.c \
 	mathexpr.c \
 	mempool.c \
@@ -57,12 +56,13 @@ gcc -Wall \
     statsrpt.c \
     subcatch.c \
 	surfqual.c \
+	swmm5.c \
     table.c \
     toposort.c \
     transect.c \
     treatmnt.c \
     xsect.c \
-    -o epaswmm5.1.13 -lm -lomp
+    -o epaswmm5.1.14 -lm -lomp
 cd ..
-mv ./src/epaswmm5.1.13 .
+mv ./src/epaswmm5.1.14 .
 rm -rf ./src
