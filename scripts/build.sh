@@ -54,12 +54,13 @@ gcc -Wall \
     stats.c \
     statsrpt.c \
     subcatch.c \
+	surfqual.c \
     table.c \
     toposort.c \
     transect.c \
     treatmnt.c \
     xsect.c \
-    -o epaswmm5.1.7 -lm
+    -o epaswmm5.1.8 -lm
 cd ..
-mv ./src/epaswmm5.1.7 .
+mv ./src/epaswmm5.1.8 .
 rm -rf ./src
