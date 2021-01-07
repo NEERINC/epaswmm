@@ -11,8 +11,8 @@
 #define _CRT_SECURE_NO_DEPRECATE
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
 #include "headers.h"
 #include "odesolve.h"
 
