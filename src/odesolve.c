@@ -9,8 +9,8 @@
 //   Author:   L. Rossman
 //-----------------------------------------------------------------------------
 
-#include <math.h>
 #include <stdlib.h>
+#include <math.h>
 #include "odesolve.h"
 
 #define MAXSTP 10000
