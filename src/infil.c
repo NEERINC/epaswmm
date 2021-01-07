@@ -13,7 +13,6 @@
 
 #include <math.h>
 #include "stdlib.h"
-#include "stdlib.h"
 #include "headers.h"
 #include "infil.h"
 
