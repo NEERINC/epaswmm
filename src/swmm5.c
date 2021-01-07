@@ -286,7 +286,7 @@ int DLLEXPORT swmm_open(char* f1, char* f2, char* f3)
         // --- write project title to report file & validate data
         report_writeTitle();
         project_validate();
-	report_writeOptions();
+	    report_writeOptions();
 
         // --- write input summary to report file if requested
         if ( RptFlags.input ) inputrpt_writeInput();
