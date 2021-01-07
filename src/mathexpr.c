@@ -44,8 +44,8 @@
 #define _CRT_SECURE_NO_DEPRECATE
 
 #include <ctype.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
 #include "mathexpr.h"
 
