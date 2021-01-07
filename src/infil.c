@@ -5,11 +5,18 @@
 //   Version:  5.1
 //   Date:     03/20/14  (Build 5.1.001)
 //             09/15/14  (Build 5.1.007)
+//             03/19/15  (Build 5.1.008)
 //   Author:   L. Rossman
 //
 //   Infiltration functions.
 //
-//   The Green-Ampt functions were re-written for release 5.1.007.
+//   Build 5.1.007:
+//   - Revised formula for infiltration capacity recovery for the Modified
+//     Horton method.
+//   - The Green-Ampt functions were re-written.
+//
+//   Build 5.1.008:
+//   - Monthly adjustment factors applied to hydraulic conductivity.
 //
 //-----------------------------------------------------------------------------
 #define _CRT_SECURE_NO_DEPRECATE
@@ -59,8 +66,6 @@ static double modHorton_getInfil(THorton *infil, double tstep, double irate,
 ////  Revised set of functions for Green-Ampt infiltration  ////               //(5.1.007)
 static void   grnampt_getState(TGrnAmpt *infil, double x[]);
 static void   grnampt_setState(TGrnAmpt *infil, double x[]);
-static double grnampt_getRate(TGrnAmpt *infil, double tstep, double F2,
-              double F);
 static double grnampt_getUnsatInfil(TGrnAmpt *infil, double tstep,
               double irate, double depth);
 static double grnampt_getSatInfil(TGrnAmpt *infil, double tstep,
@@ -189,7 +194,7 @@ void infil_initState(int j, int m)
 {
     switch (m)
     {
-      case HORTON:       
+      case HORTON:
       case MOD_HORTON:   horton_initState(&HortInfil[j]);   break;
       case GREEN_AMPT:   grnampt_initState(&GAInfil[j]);    break;
       case CURVE_NUMBER: curvenum_initState(&CNInfil[j]);   break;
@@ -208,7 +213,7 @@ void infil_getState(int j, int m, double x[])
 {
     switch (m)
     {
-      case HORTON:       
+      case HORTON:
       case MOD_HORTON:   horton_getState(&HortInfil[j], x); break;
       case GREEN_AMPT:   grnampt_getState(&GAInfil[j],x);   break;
       case CURVE_NUMBER: curvenum_getState(&CNInfil[j], x); break;
@@ -227,7 +232,7 @@ void infil_setState(int j, int m, double x[])
 {
     switch (m)
     {
-      case HORTON:       
+      case HORTON:
       case MOD_HORTON:   horton_setState(&HortInfil[j], x); break;
       case GREEN_AMPT:   grnampt_setState(&GAInfil[j],x);   break;
       case CURVE_NUMBER: curvenum_setState(&CNInfil[j], x); break;
@@ -347,10 +352,11 @@ double horton_getInfil(THorton *infil, double tstep, double irate, double depth)
     double fa, fp = 0.0;
     double Fp, F1, t1, tlim, ex, kt;
     double FF, FF1, r;
-    double fmin = infil->fmin;
+    double f0   = infil->f0 * Adjust.hydconFactor;                             //(5.1.008)
+    double fmin = infil->fmin * Adjust.hydconFactor;                           //(5.1.008)
     double Fmax = infil->Fmax;
     double tp   = infil->tp;
-    double df   = infil->f0 - fmin;
+    double df   = f0 - fmin;                                                   //(5.1.008)
     double kd   = infil->decay;
     double kr   = infil->regen * Evap.recoveryFactor;
 
@@ -358,7 +364,7 @@ double horton_getInfil(THorton *infil, double tstep, double irate, double depth)
     if ( df < 0.0 || kd < 0.0 || kr < 0.0 ) return 0.0;
     if ( df == 0.0 || kd == 0.0 )
     {
-        fp = infil->f0;
+        fp = f0;                                                               //(5.1.008)
         fa = irate + depth / tstep;
         if ( fp > fa ) fp = fa;
         return MAX(0.0, fp);
@@ -429,7 +435,7 @@ double horton_getInfil(THorton *infil, double tstep, double irate, double depth)
         tp = 1.0 - exp(-kd * tp);
         tp = -log(1.0 - r*tp) / kd;
 
-        // reduction in cumulative infiltration 
+        // reduction in cumulative infiltration
         if ( Fmax > 0.0 )
         {
             infil->Fe = fmin*tp + (df/kd)*(1.0 - exp(-kd*tp));
@@ -456,7 +462,9 @@ double modHorton_getInfil(THorton *infil, double tstep, double irate,
     // --- assign local variables
     double f  = 0.0;
     double fp, fa;
-    double df = infil->f0 - infil->fmin;
+    double f0 = infil->f0 * Adjust.hydconFactor;                               //(5.1.008)
+    double fmin = infil->fmin * Adjust.hydconFactor;                           //(5.1.008)
+    double df = f0 - fmin;                                                     //(5.1.008)
     double kd = infil->decay;
     double kr = infil->regen * Evap.recoveryFactor;
 
@@ -464,7 +472,7 @@ double modHorton_getInfil(THorton *infil, double tstep, double irate,
     if ( df < 0.0 || kd < 0.0 || kr < 0.0 ) return 0.0;
     if ( df == 0.0 || kd == 0.0 )
     {
-        fp = infil->f0;
+        fp = f0;                                                               //(5.1.008)
         fa = irate + depth / tstep;
         if ( fp > fa ) fp = fa;
         return MAX(0.0, fp);
@@ -480,13 +488,13 @@ double modHorton_getInfil(THorton *infil, double tstep, double irate,
         if ( infil->Fmax > 0.0 && infil->Fe >= infil->Fmax ) return 0.0;
 
         // --- potential infiltration
-        fp = infil->f0 - kd * infil->Fe;
+        fp = f0 - kd * infil->Fe;                                              //(5.1.008)
 
         // --- actual infiltration
         f = MIN(fa, fp);
 
         // --- new cumulative infiltration minus seepage
-        infil->Fe += MAX((f - infil->fmin), 0.0) * tstep;
+        infil->Fe += MAX((f - fmin), 0.0) * tstep;                             //(5.1.008)
         if ( infil->Fmax > 0.0 ) infil->Fe = MAX(infil->Fe, infil->Fmax);
     }
 
@@ -498,7 +506,7 @@ double modHorton_getInfil(THorton *infil, double tstep, double irate,
     }
     return f;
 }
-    
+
 //=============================================================================
 
 int grnampt_setParams(TGrnAmpt *infil, double p[])
@@ -605,6 +613,7 @@ double grnampt_getUnsatInfil(TGrnAmpt *infil, double tstep, double irate,
 //
 {
     double ia, c1, F2, dF, Fs, kr, ts;
+    double ks = infil->Ks * Adjust.hydconFactor;                               //(5.1.008)
 
     // --- get available infiltration rate (rainfall + ponded water)
     ia = irate + depth / tstep;
@@ -636,8 +645,8 @@ double grnampt_getUnsatInfil(TGrnAmpt *infil, double tstep, double irate,
     }
 
     // --- rainfall does not exceed Ksat
-    if ( ia <= infil->Ks )
-    {    
+    if ( ia <= ks )                                                            //(5.1.008)
+    {
         dF = ia * tstep;
         infil->F += dF;
         infil->Fu += dF;
@@ -654,7 +663,7 @@ double grnampt_getUnsatInfil(TGrnAmpt *infil, double tstep, double irate,
     infil->T = 5400.0 / infil->Lu / Evap.recoveryFactor;
 
     // --- find volume needed to saturate surface layer
-    Fs = infil->Ks * (infil->S + depth) * infil->IMD / (ia - infil->Ks);
+    Fs = ks * (infil->S + depth) * infil->IMD / (ia - ks);                     //(5.1.008)
 
     // --- surface layer already saturated
     if ( infil->F > Fs )
@@ -662,7 +671,7 @@ double grnampt_getUnsatInfil(TGrnAmpt *infil, double tstep, double irate,
         infil->Sat = TRUE;
         return grnampt_getSatInfil(infil, tstep, irate, depth);
     }
-        
+
     // --- surface layer remains unsaturated
     if ( infil->F + ia*tstep < Fs )
     {
@@ -680,7 +689,7 @@ double grnampt_getUnsatInfil(TGrnAmpt *infil, double tstep, double irate,
 
     // --- compute new total volume infiltrated
     c1 = (infil->S + depth) * infil->IMD;
-    F2 = grnampt_getF2(Fs, c1, infil->Ks, ts);
+    F2 = grnampt_getF2(Fs, c1, ks, ts);                                        //(5.1.008)
     if ( F2 > Fs + ia*ts ) F2 = Fs + ia*ts;
 
     // --- compute infiltration rate
@@ -711,6 +720,7 @@ double grnampt_getSatInfil(TGrnAmpt *infil, double tstep, double irate,
 //
 {
     double ia, c1, dF, F2;
+    double ks = infil->Ks * Adjust.hydconFactor;                               //(5.1.008)
 
     // --- get available infiltration rate (rainfall + ponded water)
     ia = irate + depth / tstep;
@@ -721,7 +731,7 @@ double grnampt_getSatInfil(TGrnAmpt *infil, double tstep, double irate,
 
     // --- solve G-A equation for new cumulative infiltration volume (F2)
     c1 = (infil->S + depth) * infil->IMD;
-    F2 = grnampt_getF2(infil->F, c1, infil->Ks, tstep);
+    F2 = grnampt_getF2(infil->F, c1, ks, tstep);                               //(5.1.008)
     dF = F2 - infil->F;
 
     // --- all available water infiltrates -- set saturated state to false
@@ -805,7 +815,7 @@ int curvenum_setParams(TCurveNum *infil, double p[])
     infil->Smax    = (1000.0 / p[0] - 10.0) / 12.0;
     if ( infil->Smax < 0.0 ) return FALSE;
 
-//// ---- linear regeneration constant and inter-event --- //// 
+//// ---- linear regeneration constant and inter-event --- ////
 ////      time now computed directly from drying time;     ////
 ////      hydraulic conductivity no longer used.           ////
 
@@ -863,7 +873,7 @@ double curvenum_getInfil(TCurveNum *infil, double tstep, double irate,
 //
 //  Input:   infil = ptr. to Curve Number infiltration object
 //           tstep = runoff time step (sec),
-//           irate = rainfall rate (ft/sec);                        
+//           irate = rainfall rate (ft/sec);
 //           depth = depth of runon + ponded water (ft)
 //  Output:  returns infiltration rate (ft/sec)
 //  Purpose: computes infiltration rate using the Curve Number method.
@@ -904,7 +914,7 @@ double curvenum_getInfil(TCurveNum *infil, double tstep, double irate,
     {
         // --- if there is ponded water then use previous infil. rate
         if ( depth > MIN_TOTAL_DEPTH && infil->S > 0.0 )
-        {    
+        {
             f1 = infil->f;
             if ( f1*tstep > infil->S ) f1 = infil->S / tstep;
         }
