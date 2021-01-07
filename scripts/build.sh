@@ -47,6 +47,7 @@ gcc -Wall \
     rain.c \
     rdii.c \
     report.c \
+	roadway.c \
     routing.c \
     runoff.c \
     shape.c \
@@ -60,7 +61,7 @@ gcc -Wall \
     transect.c \
     treatmnt.c \
     xsect.c \
-    -o epaswmm5.1.9 -lm -lomp
+    -o epaswmm5.1.10 -lm -lomp
 cd ..
-mv ./src/epaswmm5.1.9 .
+mv ./src/epaswmm5.1.10 .
 rm -rf ./src
