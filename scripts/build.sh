@@ -9,6 +9,7 @@ cd ./src
 sed -i "" 's/#define DLL/\/\/#define DLL/' ./swmm5.c
 sed -i "" 's/\/\/#define CLE/#define CLE/' ./swmm5.c
 gcc -Wall \
+	main.c \
 	swmm5.c \
 	climate.c \
 	controls.c \
@@ -61,7 +62,7 @@ gcc -Wall \
     transect.c \
     treatmnt.c \
     xsect.c \
-    -o epaswmm5.1.12 -lm -lomp
+    -o epaswmm5.1.13 -lm -lomp
 cd ..
-mv ./src/epaswmm5.1.12 .
+mv ./src/epaswmm5.1.13 .
 rm -rf ./src
